@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8b24b5">
+<title>iCrédito V.1.11</title>
+<style>
+:root{
+  --purple:#830AD1; --purple2:#c13bd0; --purple3:#e9c7f1;
+  --bg:#f7f5fa; --text:#25232a; --muted:#77727d;
+  --green:#238b57; --red:#b53d48; --white:#fff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+body{
+ padding-bottom:calc(88px + env(safe-area-inset-bottom));
+ padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)
+}
+button,input{font:inherit}
+button{border:0;cursor:pointer}
+.app{width:100%;max-width:900px;margin:auto;min-height:100vh}
+.top-space{height:env(safe-area-inset-top);background:#141322}
+.home-hero{
+  margin:0 0 24px;padding:34px 30px 38px;
+  color:#fff;border-radius:0 0 52px 52px;
+  background:
+    radial-gradient(circle at 88% 15%,rgba(255,255,255,.14),transparent 25%),
+    linear-gradient(125deg,#7d18b5 0%,#830AD1 62%,#a82fd0 100%);
+  box-shadow:0 18px 35px rgba(131,10,209,.20);
+}
+.hero-row{display:flex;align-items:center;gap:15px}
+.avatar{
+  width:76px;height:76px;border-radius:50%;object-fit:cover;
+  border:3px solid rgba(255,255,255,.9);background:#f0d9f5;
+  display:flex;align-items:center;justify-content:center;color:var(--purple);font-weight:800;font-size:30px;
+}
+.hero-name{font-size:30px;font-weight:800;line-height:1.1}
+.hero-sub{font-size:18px;opacity:.9;margin-top:5px}
+.hero-total-label{margin-top:38px;font-size:18px}
+.hero-total{font-size:48px;font-weight:850;margin-top:3px;letter-spacing:-1px}
+.home-only{display:block}
+.page{padding:0 30px 25px}
+.page h1{font-size:42px;line-height:1.1;margin:28px 0 28px;letter-spacing:-1.5px}
+.card{
+  background:#fff;border:1px solid #e8e3eb;border-radius:30px;
+  padding:25px 28px;margin-bottom:22px;box-shadow:0 7px 25px rgba(30,15,40,.045)
+}
+.loan-head{display:flex;align-items:center;gap:15px}
+.loan-icon,.section-icon{
+  width:64px;height:64px;border-radius:20px;background:#f0d7f5;color:var(--purple);
+  display:flex;align-items:center;justify-content:center;flex:none
+}
+.loan-icon svg,.section-icon svg{width:30px;height:30px}
+.loan-title{font-size:23px;font-weight:800}
+.muted{color:var(--muted);font-size:18px;margin-top:4px}
+.badge{margin-left:auto;padding:9px 15px;border-radius:16px;background:#dff4e9;color:var(--green);font-weight:750}
+.badge.active{background:#f0d7f5;color:#7b2598}
+.progress-row{display:flex;justify-content:space-between;margin-top:28px;font-size:18px}
+.progress{height:12px;background:#eee9f0;border-radius:99px;overflow:hidden;margin-top:12px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,#830AD1,#c132c9);border-radius:99px}
+.primary{
+  width:100%;margin-top:20px;padding:17px 20px;border-radius:17px;color:white;font-weight:800;font-size:18px;
+  background:linear-gradient(100deg,#830AD1,#b32cc6)
+}
+.secondary{background:#f5e8f8;color:#7b2598}
+.danger{color:var(--red);border:1px solid #efcfd3;background:white}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:26px 35px}
+.stat label{display:block;color:var(--muted);font-size:17px;margin-bottom:5px}.stat strong{font-size:25px}
+.next-value{font-size:43px;font-weight:850;margin:16px 0 0}
+.status{color:var(--green);font-weight:750;margin-top:8px}
+.section-top{display:flex;align-items:center;gap:15px;margin-bottom:22px}
+.section-top h2{font-size:25px;margin:0}
+.parcel-row{display:flex;align-items:center;gap:15px;padding:16px 0;border-bottom:1px solid #ece8ed}
+.parcel-row:last-child{border-bottom:0}
+.check{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#dcefe5;color:var(--green);font-size:22px;font-weight:900}
+.check.pending{background:#f0edf2;color:#9b949e}
+.parcel-info{flex:1}.parcel-title{font-size:18px;font-weight:800}.parcel-date{color:var(--muted);font-size:17px}
+.parcel-money{font-weight:800;font-size:18px}
+.empty{text-align:center;color:var(--muted);padding:50px 15px}
+.profile-card{text-align:left}
+.profile-grid{display:grid;grid-template-columns:120px 1fr;gap:25px;align-items:center}
+.profile-avatar{width:105px;height:105px;border-radius:50%;object-fit:cover;background:#ecd4f2;border:3px solid #fff;box-shadow:0 3px 12px #0001;display:flex;align-items:center;justify-content:center;color:var(--purple);font-weight:800;font-size:34px;line-height:1;overflow:hidden}
+label.field{font-weight:750;display:block;margin:18px 0 8px}
+input[type=text]{width:100%;padding:16px 18px;border:1px solid #d9d3dc;border-radius:16px;outline:none;background:#fff}
+input[type=text]:focus{border-color:var(--purple);box-shadow:0 0 0 3px #830AD122}
+input[type=file]{display:none}
+.admin-panel{border:2px solid #ead6ef}
+.admin-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.small-btn{padding:12px 15px;border-radius:13px;background:#f2e4f6;color:#76218e;font-weight:750}
+.admin-loan{border:1px solid #e7e0e9;border-radius:20px;padding:18px;margin-top:13px}
+.admin-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.admin-actions button{padding:11px 13px;border-radius:12px;font-weight:700}
+.notification-panel{
+ position:fixed;z-index:50;top:calc(72px + env(safe-area-inset-top));right:max(18px,calc((100vw - 900px)/2 + 18px));
+ width:min(390px,calc(100vw - 36px));max-height:70vh;overflow:auto;background:#fff;border:1px solid #e5dfe8;
+ border-radius:24px;box-shadow:0 20px 55px #25102e30;padding:18px;display:none
+}
+.notification-panel.open{display:block}
+.notification-open .home-actions .bell{display:none !important}
+.notification-open .admin-open{display:none !important}
+.notif-head{display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:800;margin-bottom:8px}
+.notif{padding:14px 3px;border-bottom:1px solid #eee9ef}.notif:last-child{border:0}
+.notif strong{display:block}.notif span{color:var(--muted);font-size:14px}
+.home-actions{display:flex;justify-content:flex-end;margin-bottom:-5px}
+.bell{
+ width:54px;height:54px;border-radius:50%;background:#ffffff20;color:white;border:1px solid #ffffff38;
+ display:flex;align-items:center;justify-content:center
+}
+.bell svg{width:28px}
+.admin-open{
+ position:fixed;z-index:40;right:max(18px,calc((100vw - 900px)/2 + 18px));top:calc(12px + env(safe-area-inset-top));
+ padding:12px 20px;border-radius:28px;background:#fff;color:#51215f;font-weight:850;box-shadow:0 7px 22px #0002
+}
+.bottom-nav{
+ position:fixed;z-index:35;left:0;right:0;bottom:env(safe-area-inset-bottom);
+ padding:8px 10px 8px;
+ background:rgba(255,255,255,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+ border-top:1px solid #e9e4eb;box-shadow:0 -6px 22px #00000008
+}
+.nav-inner{max-width:900px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.nav-btn{background:transparent;color:#96909a;padding:7px 3px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700;line-height:1.05}
+.nav-btn svg{width:25px;height:25px;stroke:currentColor}.nav-btn.active{color:var(--purple)}
+.nav-btn span{font-size:12.5px;line-height:1.05}
+.toast{position:fixed;z-index:100;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);
+background:#29232d;color:#fff;padding:13px 18px;border-radius:14px;display:none;box-shadow:0 8px 30px #0003}
+.toast.show{display:block}
+@media(max-width:600px){
+ .page{padding:0 20px 20px}.home-hero{padding:28px 20px 34px;border-radius:0 0 42px 42px}
+ .hero-name{font-size:28px}.hero-total{font-size:43px}.page h1{font-size:38px}
+ .card{padding:22px 20px;border-radius:26px}.stats{gap:22px 15px}
+ .profile-grid{grid-template-columns:1fr;text-align:center}.profile-avatar{margin:auto}
+}
+
+/* ===== iCrédito V9.9 — ANDROID LAYOUT FIX FINAL ===== */
+
+/* O conteúdo nunca deve ficar atrás da navegação do Android. */
+html, body {
+  margin: 0 !important;
+  min-height: 100% !important;
+  width: 100%;
+}
+
+body {
+  padding-bottom: calc(105px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Barra do app fica ACIMA da barra de navegação do Android.
+   O valor de 76px é intencional para wrappers que não fornecem
+   safe-area-inset-bottom. */
+.bottom-nav {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  width: 100% !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  z-index: 9999 !important;
+  box-sizing: border-box !important;
+}
+
+/* Não deixa o último card ser escondido pela barra do app. */
+.page {
+  padding-bottom: 35px !important;
+}
+
+/* O sino pertence ao cabeçalho e fica abaixo do Admin,
+   nunca atrás dele. */
+.home-hero {
+  position: relative !important;
+}
+
+.home-actions {
+  position: absolute !important;
+  top: 70px !important;
+  right: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  z-index: 1001 !important;
+}
+
+.home-actions .bell {
+  position: static !important;
+  width: 54px !important;
+  height: 54px !important;
+  margin: 0 !important;
+}
+
+/* Admin fica no topo, separado verticalmente do sino. */
+.admin-open {
+  position: fixed !important;
+  top: calc(8px + env(safe-area-inset-top, 0px)) !important;
+  right: max(18px, calc((100vw - 900px) / 2 + 18px)) !important;
+  z-index: 1002 !important;
+  margin: 0 !important;
+  min-width: 82px !important;
+  height: 52px !important;
+  padding: 0 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 28px !important;
+}
+
+/* Mantém o cabeçalho com espaço suficiente para as ações. */
+.home-hero .hero-row {
+  padding-top: 6px;
+}
+
+/* Se a tela for muito estreita, mantém tudo dentro da tela. */
+@media (max-width: 380px) {
+  .admin-open {
+    right: 12px !important;
+    min-width: 76px !important;
+    padding: 0 16px !important;
+  }
+  .home-actions {
+    right: 14px !important;
+  }
+}
+
+/* ===== FIM DO FIX V9.3 ===== */
+
+
+/* V9.3 — ajuste final do botão ADMIN */
+.admin-open {
+  top: 42px !important;
+  right: 18px !important;
+  z-index: 1002 !important;
+}
+
+/* Em telas muito estreitas, mantém o botão dentro da área útil. */
+@media (max-width: 380px) {
+  .admin-open {
+    top: 40px !important;
+    right: 12px !important;
+  }
+}
+
+
+/* ===== V9.5 ===== */
+.bottom-nav{bottom:calc(37px + env(safe-area-inset-bottom,0px)) !important;}
+body{padding-bottom:calc(116px + env(safe-area-inset-bottom,0px)) !important;}
+.admin-open{top:30px !important;right:18px !important;z-index:1002 !important;}
+.home-actions{top:102px !important;right:20px !important;z-index:1001 !important;}
+.loan-next{margin-top:14px;padding:11px 14px;border-radius:14px;background:#faf5fb;color:#6e237f;display:flex;flex-direction:column;gap:3px}
+.loan-next span{font-size:14px;color:#77727d}
+.status.overdue{color:#b53d48}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:18px 0}
+.admin-stats>div{background:#faf6fb;border:1px solid #eee2f2;border-radius:16px;padding:12px 8px;text-align:center}
+.admin-stats b{display:block;font-size:18px}.admin-stats span{display:block;color:#77727d;font-size:12px;margin-top:4px}
+#adminSearch,#notifyDays,#notifyTime,#overdueLimit{width:100%;padding:14px 16px;border:1px solid #d9d3dc;border-radius:15px;background:#fff;outline:none}
+@media(max-width:600px){.admin-stats{grid-template-columns:1fr 1fr}.bottom-nav{bottom:calc(37px + env(safe-area-inset-bottom,0px)) !important}}
+
+
+/* ===== V9.5 — BARRAS PARA DEFINIR O VALOR DA PARCELA ===== */
+.loan-editor-backdrop{position:fixed;inset:0;z-index:200;background:#180c1d66;display:flex;align-items:flex-end;justify-content:center}
+.loan-editor{width:min(720px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:28px 28px 0 0;padding:22px 20px 30px;box-shadow:0 -18px 55px #0003}
+.loan-editor-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.loan-editor-head h2{margin:0;font-size:25px}
+.editor-close{width:44px;height:44px;border-radius:50%;background:#f2e5f6;color:#70218d;font-size:25px}
+.editor-field{margin:15px 0}.editor-field label,.field-label{display:block;font-weight:800;margin-bottom:8px}
+.editor-input{width:100%;padding:14px 15px;border:1px solid #d9d3dc;border-radius:15px;background:#fff;outline:none;font-size:16px}
+.editor-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px #830AD122}
+.slider-card{margin:16px 0;padding:17px;border-radius:20px;background:#faf5fc;border:1px solid #eadcf0}
+.slider-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.slider-label{font-weight:800}.slider-value{font-size:27px;font-weight:900;color:var(--purple)}
+.loan-slider{width:100%;height:38px;margin:9px 0 2px;accent-color:var(--purple)}
+.slider-range{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.calc-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.calc-box>div{background:#f7f2f8;border-radius:17px;padding:13px}.calc-box span{display:block;color:var(--muted);font-size:13px}.calc-box strong{display:block;font-size:21px;margin-top:3px}
+.editor-note{font-size:13px;color:var(--muted);line-height:1.4;margin-top:10px}
+.editor-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.editor-actions .primary{margin-top:0}.editor-secondary{width:100%;padding:15px;border-radius:16px;background:#f2e4f6;color:#76218e;font-weight:800}
+@media(max-width:430px){.loan-editor{padding-bottom:24px}}
+
+
+/* ===== V9.7 — AJUSTE DO EDITOR DE NOVO EMPRÉSTIMO ===== */
+/* O modal ocupa a tela útil inteira e cria espaço real para os botões,
+   sem deixar SALVAR CONTRATO atrás da navegação do Android. */
+.loan-editor-backdrop{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:20000 !important;
+  padding:env(safe-area-inset-top,0px) 0 calc(92px + env(safe-area-inset-bottom,0px)) !important;
+  align-items:flex-end !important;
+  overflow:hidden !important;
+}
+.loan-editor{
+  width:min(720px,100%) !important;
+  max-height:calc(100vh - env(safe-area-inset-top,0px) - 100px) !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch !important;
+  padding:22px 20px 26px !important;
+  padding-bottom:max(26px,calc(26px + env(safe-area-inset-bottom,0px))) !important;
+}
+.editor-actions{
+  position:sticky !important;
+  bottom:0 !important;
+  z-index:5 !important;
+  background:#fff !important;
+  padding-top:12px !important;
+  padding-bottom:4px !important;
+}
+/* Enquanto o formulário de contratação estiver aberto, escondemos
+   os controles flutuantes do app para não sobrepor o editor. */
+body:has(.loan-editor-backdrop) .admin-open,
+body:has(.loan-editor-backdrop) .home-actions{
+  display:none !important;
+}
+/* ===== FIM V9.7 ===== */
+
+/* ===== V9.7 — AJUSTES FINOS DE INTERFACE ===== */
+.parcel-group{padding:0;overflow:hidden}
+.parcel-group-head{width:100%;display:flex;align-items:center;gap:12px;background:#fff;text-align:left;padding:20px 20px;min-height:82px;color:var(--text)}
+.parcel-group-main{flex:1;min-width:0}
+.parcel-group-title{font-size:20px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.parcel-group-sub{color:var(--muted);font-size:15px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.parcel-group-value{font-size:18px;font-weight:850;text-align:right;white-space:nowrap}
+.parcel-group-value span{display:block;color:var(--muted);font-size:13px;font-weight:650;margin-top:3px}
+.parcel-chevron{width:22px;height:22px;flex:none;color:#8b24b5;transition:transform .18s ease}
+.parcel-chevron.open{transform:rotate(180deg)}
+.parcel-group-list{padding:0 20px 8px;border-top:1px solid #eee9ef}
+.parcel-group-list .parcel-row{padding:14px 0}
+.profile-grid .profile-avatar:not(img){flex:none}
+
+/* Mantém os dois botões do editor unidos e deixa-os imediatamente acima
+   da área de navegação, sem invadir a navegação do Android. */
+.loan-editor-backdrop{padding-bottom:calc(98px + env(safe-area-inset-bottom,0px)) !important}
+.loan-editor{max-height:calc(100vh - env(safe-area-inset-top,0px) - 106px) !important;padding-bottom:12px !important}
+.editor-actions{gap:4px !important;margin-top:10px !important;padding-top:7px !important;padding-bottom:2px !important}
+.editor-actions .editor-secondary,.editor-actions .primary{padding:14px 10px !important;font-size:16px !important}
+
+/* A navegação do app continua visível durante a contratação e fica acima
+   do fundo do editor; o espaço reservado acima impede sobreposição. */
+body:has(.loan-editor-backdrop) .bottom-nav{display:block !important;z-index:20001 !important}
+/* ===== V9.9 — AJUSTE DE POSIÇÃO DA NAVEGAÇÃO ===== */
+/* Navegação inferior menor para manter ícones e textos totalmente acima da barra Android. */
+.bottom-nav{
+  bottom:calc(33px + env(safe-area-inset-bottom,0px)) !important;
+  padding:5px 8px 4px !important;
+}
+.nav-btn{
+  padding:3px 2px 2px !important;
+  gap:1px !important;
+}
+.nav-btn svg{
+  width:21px !important;
+  height:21px !important;
+  flex:none !important;
+}
+.nav-btn span{
+  font-size:11px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+/* Durante a contratação, somente os dois botões do editor permanecem visíveis. */
+body:has(.loan-editor-backdrop) .bottom-nav{
+  display:none !important;
+}
+/* Aproxima os botões do editor da barra Android, preservando uma margem segura. */
+.loan-editor-backdrop{
+  padding-bottom:calc(39px + env(safe-area-inset-bottom,0px)) !important;
+}
+.loan-editor{
+  max-height:calc(100vh - env(safe-area-inset-top,0px) - 46px) !important;
+  padding-bottom:8px !important;
+}
+.editor-actions{
+  gap:3px !important;
+  margin-top:7px !important;
+  padding-top:5px !important;
+  padding-bottom:0 !important;
+}
+/* Avatar sem foto: ícone de pessoa centralizado, nunca uma letra solta. */
+.avatar svg,.profile-avatar svg{
+  width:42%;height:42%;
+  stroke:currentColor;
+}
+/* ===== FIM V9.9 ===== */
+
+
+/* V9.9 — esconder Admin enquanto o painel de notificações estiver aberto */
+.notification-open #adminOpen{display:none !important;}
+</style>
+
+<style>
+.billing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}.billing-options{display:grid;gap:9px;margin:14px 0}.check-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e2dce5;border-radius:12px;background:#faf9fb;font-size:14px}.check-row input{width:18px;height:18px;accent-color:#830AD1}.billing-actions{grid-template-columns:1fr 1fr !important}.billing-actions .small-btn{white-space:normal !important;min-height:42px}.billing-card .field{display:block;margin-bottom:7px}.billing-card input[type=number],.billing-card input[type=text]{box-sizing:border-box;width:100%}
+/* Final mobile refinement */
+@media (max-width: 600px){
+  .home-header, .page-header, .section-header, .loan-header, .installments-header { padding-top: 18px !important; }
+  .home-actions { top: 116px !important; }
+  .admin-open { top: 42px !important; }
+  .page-title, .section-title { margin-top: 8px !important; }
+}
+/* Symmetric Central de controle gear */
+.gear-icon, .central-control-icon, .admin-card .icon svg, [class*="gear"] svg { transform: none !important; rotate: none !important; skew: none !important; }
+</style>
+
+<style>
+/* V9.9 — refinamento final da administração no celular */
+@media (max-width:600px){
+  .admin-toolbar{display:grid !important;grid-template-columns:1fr 1fr !important;gap:8px !important;}
+  .admin-toolbar .small-btn{width:100% !important;min-width:0 !important;padding:11px 8px !important;font-size:13px !important;white-space:nowrap !important;}
+  .loan-head{align-items:flex-start !important;min-width:0 !important;}
+  .loan-head > div:nth-child(2){min-width:0 !important;flex:1 1 auto !important;}
+  .loan-title{font-size:20px !important;line-height:1.15 !important;overflow-wrap:anywhere !important;}
+  .loan-head .badge{flex:0 0 auto !important;margin-left:6px !important;padding:8px 11px !important;font-size:13px !important;white-space:nowrap !important;}
+}
+/* Engrenagem perfeitamente alinhada */
+.admin-panel .section-icon svg{width:30px;height:30px;display:block;transform:none !important;rotate:0deg !important;skew:0deg !important;}
+</style>
+<style>.billing-icon svg{width:30px !important;height:30px !important;display:block !important;transform:none !important;rotate:0deg !important;skew:0deg !important}.billing-icon{display:flex !important;align-items:center !important;justify-content:center !important}</style>
+
+<style>
+/* V9.9.5 — cifrão de cobrança redesenhado */
+.billing-icon svg{width:30px !important;height:30px !important;display:block !important;transform:none !important;rotate:0deg !important;skew:0deg !important;}
+.billing-icon{display:flex !important;align-items:center !important;justify-content:center !important;}
+</style>
+</head>
+<body>
+<div class="top-space"></div>
+<div class="app" id="app"></div>
+
+<div class="notification-panel" id="notificationPanel">
+  <div class="notif-head"><span>Notificações</span><button class="small-btn" onclick="clearNotifications()">Limpar</button></div>
+  <div id="notificationList"></div>
+</div>
+
+<button class="admin-open" id="adminOpen" onclick="openAdmin()">Admin</button>
+
+<nav class="bottom-nav">
+ <div class="nav-inner">
+  <button class="nav-btn" data-page="home" onclick="go('home')"><svg fill="none" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5v8a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 19.5v-8Z" stroke="currentColor" stroke-width="2"/><path d="M9 21v-6h6v6" stroke="currentColor" stroke-width="2"/></svg><span>Início</span></button>
+  <button class="nav-btn" data-page="loans" onclick="go('loans')"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 6V4h10v2M3 10h18M15 15h3" stroke="currentColor" stroke-width="2"/></svg><span>Empréstimos</span></button>
+  <button class="nav-btn" data-page="parcels" onclick="go('parcels')"><svg fill="none" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2"/></svg><span>Parcelas</span></button>
+  <button class="nav-btn" data-page="profile" onclick="go('profile')"><svg fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 21c.8-4.2 3.4-6 8-6s7.2 1.8 8 6" stroke="currentColor" stroke-width="2"/></svg><span>Perfil</span></button>
+ </div>
+</nav>
+<input id="importFile" type="file" accept="application/json" style="display:none"><div class="toast" id="toast"></div>
+
+<script>
+const KEY='loanBuddyV95State';
+const OLD_KEY='loanBuddyV9State';
+const uid=()=> (crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()));
+const todayISO=()=>{const d=new Date(); return d.toISOString().slice(0,10)};
+const addMonths=(iso,n)=>{const d=new Date(iso+'T12:00:00');d.setMonth(d.getMonth()+n);return d.toISOString().slice(0,10)};
+const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const fmtDate=s=>{const d=new Date(s+'T12:00:00');return isNaN(d)?s:d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})};
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function normalizeLoan(l){
+  const count=Math.max(1,Number(l.installments)||1);
+  let schedule=Array.isArray(l.schedule)?l.schedule.map((x,i)=>({number:i+1,amount:Number(x.amount)||0,due:x.due||addMonths(l.firstDue||todayISO(),i),paid:!!x.paid})):[];
+  if(!schedule.length){
+    const val=Number(l.installmentValue)||(Number(l.amount)||0)/count;
+    schedule=Array.from({length:count},(_,i)=>({number:i+1,amount:val,due:addMonths(l.firstDue||todayISO(),i),paid:i<(Number(l.paid)||0)}));
+  }
+  schedule.forEach((x,i)=>{x.number=i+1;x.amount=Number(x.amount)||0;x.due=x.due||addMonths(l.firstDue||todayISO(),i);x.paid=!!x.paid});
+  l.schedule=schedule;l.installments=schedule.length;l.amount=Number(l.amount)||schedule.reduce((a,x)=>a+x.amount,0);l.firstDue=schedule[0]?.due||l.firstDue||todayISO();
+  return l;
+}
+function migrate(){
+  try{
+    const n=JSON.parse(localStorage.getItem(KEY)); if(n&&Array.isArray(n.loans)) return n;
+    const old=JSON.parse(localStorage.getItem(OLD_KEY));
+    if(old){old.loans=(old.loans||[]).map(normalizeLoan);old.version='9.5';localStorage.setItem(KEY,JSON.stringify(old));return old;}
+  }catch(e){}
+  return {version:'9.7',name:'Cliente',photo:'',loans:[],notifications:[],settings:{notifyDays:[7,3,1],notificationsEnabled:false,overdueLimit:1,notifyToday:true,notifyOverdue:true,notifyPayment:true}};
+}
+let state=migrate();
+state.loans=(state.loans||[]).map(normalizeLoan);state.notifications=state.notifications||[];state.settings=state.settings||{notifyDays:[7,3,1],notificationsEnabled:false,overdueLimit:1,notifyToday:true,notifyOverdue:true,notifyPayment:true};state.settings.overdueLimit=state.settings.overdueLimit||1;state.settings.notifyToday=state.settings.notifyToday!==false;state.settings.notifyOverdue=state.settings.notifyOverdue!==false;state.settings.notifyPayment=state.settings.notifyPayment!==false;
+let current='home',touchX=0,touchY=0,adminFilter='';
+function save(){localStorage.setItem(KEY,JSON.stringify(state));clearTimeout(window.__sch);window.__sch=setTimeout(scheduleBillingNative,1500);}
+function initials(){return (state.name||'Cliente').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'C'}
+function avatarHtml(cls='avatar'){return state.photo?`<img class="${cls}" src="${state.photo}" alt="Foto de perfil">`:`<div class="${cls}" aria-label="Sem foto de perfil"><svg fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.9"/><path d="M4 21c.8-4.2 3.4-6 8-6s7.2 1.8 8 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></div>`}
+function total(){return state.loans.reduce((s,l)=>s+l.schedule.reduce((a,x)=>a+x.amount,0),0)}
+function paidTotal(){return state.loans.reduce((s,l)=>s+l.schedule.filter(x=>x.paid).reduce((a,x)=>a+x.amount,0),0)}
+function nextParcel(l){return l.schedule.find(x=>!x.paid)||null}
+function daysUntil(iso){const a=new Date();a.setHours(0,0,0,0);const b=new Date(iso+'T00:00:00');return Math.ceil((b-a)/86400000)}
+function statusText(p){const d=daysUntil(p.due);return d<0?`Atrasada há ${Math.abs(d)} dia(s)`:d===0?'Vence hoje':`Faltam ${d} dia(s)`}
+function header(){return current==='home'?`<section class="home-hero home-only"><div class="home-actions"><button class="bell" aria-label="Notificações" onclick="toggleNotifications()"><svg fill="none" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="hero-row">${avatarHtml('avatar')}<div><div class="hero-name">Olá, ${escapeHtml(state.name||'Cliente')}</div><div class="hero-sub">Bem-vindo de volta</div></div></div><div class="hero-total-label">Total dos meus empréstimos</div><div class="hero-total">${money(total())}</div></section>`:''}
+function loanCard(l,admin=false){const done=l.schedule.every(x=>x.paid);const paid=l.schedule.filter(x=>x.paid).length;const next=nextParcel(l);const pct=l.schedule.length?Math.round(paid/l.schedule.length*100):0;return `<div class="card ${admin?'admin-loan':''}"><div class="loan-head"><div class="loan-icon"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 6V4h10v2M3 10h18" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="loan-title">${escapeHtml(l.title)}</div><div class="muted">${escapeHtml(l.borrower)} · ${money(l.amount)} · ${next?money(next.amount):money(0)}/parcela</div></div><span class="badge ${done?'':'active'}">${done?'QUITADO':'ATIVO'}</span></div><div class="progress-row"><span>Parcelas pagas</span><b>${paid}/${l.schedule.length}</b></div><div class="progress"><i style="width:${pct}%"></i></div>${next?`<div class="loan-next"><strong>Próxima: ${fmtDate(next.due)}</strong><span>${statusText(next)} · ${money(next.amount)}</span></div>`:`<div class="status">● Todas as parcelas pagas</div>`}${!admin?`<button class="primary" onclick="openLoanDetails('${l.id}')">VER PARCELAS</button>`:`<div class="admin-actions"><button class="small-btn" onclick="markNext('${l.id}')">${next?'MARCAR PRÓXIMA PAGA':'DESMARCAR ÚLTIMA'}</button><button class="small-btn" onclick="editLoan('${l.id}')">EDITAR CONTRATO</button><button class="small-btn" onclick="openSchedule('${l.id}')">GERIR PARCELAS</button><button class="small-btn" onclick="toggleAllPaid('${l.id}')">${done?'DESMARCAR TODAS':'MARCAR TODAS PAGAS'}</button><button class="small-btn danger" onclick="deleteLoan('${l.id}')">EXCLUIR</button></div>`}</div>`}
+function home(){return `${header()}<main class="page"><h1>Meus empréstimos</h1>${state.loans.length?state.loans.map(l=>loanCard(l)).join(''):`<div class="card empty">Nenhum empréstimo cadastrado.</div>`}<div class="card"><div class="section-top"><div class="section-icon"><svg fill="none" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M7 15l3-4 3 2 5-7" stroke="currentColor" stroke-width="2"/></svg></div><h2>Resumo financeiro</h2></div><div class="stats"><div class="stat"><label>Total contratado</label><strong>${money(total())}</strong></div><div class="stat"><label>Total pago</label><strong>${money(paidTotal())}</strong></div><div class="stat"><label>Saldo restante</label><strong>${money(total()-paidTotal())}</strong></div><div class="stat"><label>Parcelas</label><strong>${state.loans.reduce((s,l)=>s+l.schedule.filter(x=>x.paid).length,0)}/${state.loans.reduce((s,l)=>s+l.schedule.length,0)}</strong></div></div><div class="progress"><i style="width:${total()?Math.round(paidTotal()/total()*100):0}%"></i></div></div><div class="card"><div class="section-top"><div class="section-icon"><svg fill="none" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2"/></svg></div><h2>Próximo pagamento</h2></div>${(()=>{let items=state.loans.map(l=>({l,p:nextParcel(l)})).filter(x=>x.p).sort((a,b)=>a.p.due.localeCompare(b.p.due));if(!items.length)return `<div class="next-value">${money(0)}</div><div class="muted">Nenhum pagamento pendente</div>`;let x=items[0];return `<div class="next-value">${money(x.p.amount)}</div><div class="muted">${escapeHtml(x.l.title)} · Vencimento: ${fmtDate(x.p.due)}</div><div class="status ${daysUntil(x.p.due)<0?'overdue':''}">● ${statusText(x.p)}</div>`})()}</div></main>`}
+function loansPage(){return `<main class="page"><h1>Empréstimos</h1>${state.loans.length?state.loans.map(l=>loanCard(l)).join(''):`<div class="card empty">Nenhum empréstimo cadastrado.</div>`}</main>`}
+function parcelsPage(){return `<main class="page"><h1>Parcelas</h1>${state.loans.length?state.loans.map(l=>{const paid=l.schedule.filter(p=>p.paid).length;const total=l.schedule.reduce((s,p)=>s+Number(p.amount||0),0);return `<div class="parcel-group card"><button class="parcel-group-head" onclick="toggleParcelGroup('${l.id}')"><div class="parcel-group-main"><div class="parcel-group-title">${escapeHtml(l.borrower)}</div><div class="parcel-group-sub">${escapeHtml(l.title)}</div></div><div class="parcel-group-value">${money(total)}<span>${paid}/${l.schedule.length} pagas</span></div><svg class="parcel-chevron" id="chev-${l.id}" fill="none" viewBox="0 0 24 24"><path d="m7 9 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="parcel-group-list" id="group-${l.id}" style="display:none">${l.schedule.map(p=>`<div class="parcel-row"><div class="check ${p.paid?'':'pending'}">${p.paid?'✓':'○'}</div><div class="parcel-info"><div class="parcel-title">${p.number}ª parcela</div><div class="parcel-date">${fmtDate(p.due)}</div></div><div class="parcel-money">${money(p.amount)}</div></div>`).join('')}</div></div>`}).join(''):`<div class="card empty">Nenhum empréstimo cadastrado.</div>`}</main>`}
+function toggleParcelGroup(id){const box=document.getElementById('group-'+id);const chev=document.getElementById('chev-'+id);if(!box)return;const open=box.style.display!=='none';box.style.display=open?'none':'block';if(chev)chev.classList.toggle('open',!open)}
+function profilePage(){return `<main class="page"><h1>Meu perfil</h1><div class="card profile-card"><div class="profile-grid">${avatarHtml('profile-avatar')}<div><label class="primary" style="display:block;text-align:center;cursor:pointer;margin:0">ADICIONAR / ALTERAR FOTO<input id="photoInput" type="file" accept="image/*" onchange="setPhoto(event)"></label>${state.photo?`<button class="primary secondary" style="margin-top:10px" onclick="removePhoto()">REMOVER FOTO</button>`:''}</div></div><label class="field">Seu nome</label><input id="nameInput" type="text" value="${escapeHtml(state.name)}" maxlength="60"><button class="primary" onclick="saveName()">SALVAR NOME</button></div><div class="card"><button class="primary secondary" onclick="enableNotifications()">${state.settings.notificationsEnabled?'NOTIFICAÇÕES ATIVAS':'ATIVAR NOTIFICAÇÕES'}</button><div class="muted" style="font-size:14px;margin-top:10px">Os avisos de cobrança chegam no horário configurado, mesmo com o app fechado, se o celular estiver ligado e a permissão de notificações estiver liberada.</div></div><div class="card"><button class="primary danger" onclick="resetProfile()">REDEFINIR DADOS LOCAIS</button></div></main>`}
+function adminPage(){const list=state.loans.filter(l=>!adminFilter||(`${l.title} ${l.borrower}`).toLowerCase().includes(adminFilter.toLowerCase()));return `<main class="page"><h1>Administração</h1><div class="card admin-panel"><div class="section-top"><div class="section-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.4 7.4 0 0 0-1.7-.98L14.5 2.42A.49.49 0 0 0 14.01 2h-4a.5.5 0 0 0-.49.42L9.14 5.07c-.61.25-1.18.58-1.7.98l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65c-.04.32-.08.65-.08.98s.03.66.08.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.12.21.37.3.61.22l2.49-1c.52.4 1.09.73 1.7.98l.38 2.65c.04.24.25.42.49.42h4c.24 0 .45-.18.49-.42l.38-2.65c.61-.25 1.18-.58 1.7-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/></svg></div><h2>Central de controle</h2></div><div class="admin-stats"><div><b>${state.loans.length}</b><span>Contratos</span></div><div><b>${money(total())}</b><span>Contratado</span></div><div><b>${money(paidTotal())}</b><span>Recebido</span></div><div><b>${state.loans.reduce((s,l)=>s+l.schedule.filter(x=>!x.paid&&daysUntil(x.due)<0).length,0)}</b><span>Atrasadas</span></div></div><div class="admin-toolbar"><button class="small-btn" onclick="addLoan()">+ NOVO CONTRATO</button><button class="small-btn" onclick="exportData()">EXPORTAR BACKUP</button><button class="small-btn" onclick="document.getElementById('importFile').click()">IMPORTAR BACKUP</button><button class="small-btn" onclick="runNotifications(true,true)">VERIFICAR COBRANÇAS</button></div><input id="adminSearch" type="text" placeholder="Pesquisar cliente ou empréstimo" value="${escapeHtml(adminFilter)}" oninput="adminFilter=this.value;render()" style="margin-bottom:10px">${list.length?list.map(l=>loanCard(l,true)).join(''):`<div class="empty">Nenhum contrato encontrado.</div>`}</div><div class="card billing-card"><div class="section-top"><div class="section-icon billing-icon"><svg fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 6.2v11.6M15.2 8.2h-4.4a2 2 0 0 0 0 4h2.4a2 2 0 0 1 0 4H8.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2>Configurações de cobrança</h2></div><div class="billing-grid"><div><label class="field">Avisar quantos dias antes</label><input id="notifyDays" type="text" value="${escapeHtml((state.settings.notifyDays||[7,3,1]).join(', '))}" placeholder="7, 3, 1"><div class="muted" style="font-size:13px;margin-top:6px">Ex.: 7, 3, 1. Você pode adicionar outros dias.</div></div><div><label class="field">Limite de alertas atrasados</label><input id="overdueLimit" type="number" min="1" max="30" value="${Number(state.settings.overdueLimit||1)}"><div class="muted" style="font-size:13px;margin-top:6px">Evita repetir o mesmo alerta em excesso.</div></div><div><label class="field">Horário dos avisos</label><input id="notifyTime" type="time" value="${escapeHtml(state.settings.notifyTime||'09:00')}"><div class="muted" style="font-size:13px;margin-top:6px">Hora em que os avisos chegam.</div></div></div><div class="billing-options"><label class="check-row"><input id="notifyToday" type="checkbox" ${state.settings.notifyToday!==false?'checked':''}><span>Avisar no dia do vencimento</span></label><label class="check-row"><input id="notifyOverdue" type="checkbox" ${state.settings.notifyOverdue!==false?'checked':''}><span>Avisar parcelas atrasadas</span></label><label class="check-row"><input id="notifyPayment" type="checkbox" ${state.settings.notifyPayment!==false?'checked':''}><span>Confirmar pagamento recebido</span></label></div><div class="admin-toolbar billing-actions"><button class="small-btn" onclick="saveBillingSettings()">SALVAR CONFIGURAÇÃO</button><button class="small-btn" onclick="testBillingNotification()">TESTAR NOTIFICAÇÃO</button><button class="small-btn" onclick="runNotifications(true,true)">VERIFICAR AGORA</button><button class="small-btn" onclick="resetBillingSettings()">RESTAURAR PADRÃO</button></div><div class="muted" style="font-size:14px;margin-top:10px">Controla lembretes, vencimentos de hoje, atrasos e confirmação de pagamentos. Os avisos são agendados e chegam no horário escolhido, mesmo com o app fechado.</div></div></main>`}
+function render(){let content=current==='home'?home():current==='loans'?loansPage():current==='parcels'?parcelsPage():current==='profile'?profilePage():current==='admin'?adminPage():home();document.getElementById('app').innerHTML=content;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===current));document.getElementById('adminOpen').style.display=current==='admin'?'none':'block';renderNotifications();}
+function go(p){current=p;document.getElementById('notificationPanel').classList.remove('open');document.body.classList.remove('notification-open');render();window.scrollTo({top:0,behavior:'smooth'})}
+function openAdmin(){current='admin';render();window.scrollTo({top:0,behavior:'smooth'})}
+function setPhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{state.photo=r.result;save();render()};r.readAsDataURL(f)}
+function removePhoto(){if(!state.photo)return;if(confirm('Remover a foto de perfil?')){state.photo='';save();render();toast('Foto removida.')}}
+function saveName(){const v=document.getElementById('nameInput').value.trim();if(!v)return toast('Digite um nome.');state.name=v;save();notify('Perfil atualizado','Seu nome foi alterado.');render();toast('Nome salvo.')}
+function markNext(id){const l=state.loans.find(x=>x.id===id);if(!l)return;const p=nextParcel(l);if(p){p.paid=true;notify('Pagamento registrado',`${l.title} — ${money(p.amount)} — parcela ${p.number}`)}else{const p2=l.schedule[l.schedule.length-1];if(p2){p2.paid=false;notify('Pagamento revertido',`${l.title} — parcela ${p2.number}`)}}save();runNotifications(false);render()}
+function toggleAllPaid(id){const l=state.loans.find(x=>x.id===id);if(!l)return;const all=l.schedule.every(x=>x.paid);l.schedule.forEach(x=>x.paid=!all);notify(all?'Parcelas desmarcadas':'Contrato marcado como pago',l.title);save();render()}
+function deleteLoan(id){const l=state.loans.find(x=>x.id===id);if(!l)return;if(confirm(`Excluir “${l.title}” e todas as suas parcelas?`)){state.loans=state.loans.filter(x=>x.id!==id);state.notifications=state.notifications.filter(n=>n.loanId!==id);save();notify('Empréstimo excluído',`${l.title} foi removido do painel e da tela inicial.`);save();render();toast('Empréstimo excluído.')}}
+function openLoanDetails(id){current='parcels';render();window.scrollTo({top:0,behavior:'smooth'})}
+function editLoan(id){const l=state.loans.find(x=>x.id===id);if(!l)return;showEditor(l,false)}
+function addLoan(){showEditor(null,true)}
+function showEditor(l,isNew){
+  const np=document.getElementById('notificationPanel'); if(np){np.classList.remove('open');document.body.classList.remove('notification-open');}
+  const x=l?JSON.parse(JSON.stringify(l)):normalizeLoan({
+    id:uid(),title:'Novo empréstimo',borrower:state.name||'Cliente',
+    amount:1500,installments:10,firstDue:todayISO(),installmentValue:150,schedule:[]
+  });
+  const currentAmount=Math.max(1,Number(x.amount)||1500);
+  const currentParcel=Math.max(1,Number(x.installmentValue)||Number(x.schedule?.[0]?.amount)||Math.round(currentAmount/10));
+  const modal=document.createElement('div');
+  modal.className='loan-editor-backdrop';
+  modal.innerHTML=`
+    <div class="loan-editor" role="dialog" aria-modal="true">
+      <div class="loan-editor-head">
+        <h2>${isNew?'Novo empréstimo':'Editar empréstimo'}</h2>
+        <button type="button" class="editor-close" id="editorClose">×</button>
+      </div>
+
+      <div class="editor-field">
+        <label for="edTitle">Nome do empréstimo</label>
+        <input class="editor-input" id="edTitle" value="${escapeHtml(x.title||'')}" maxlength="80">
+      </div>
+
+      <div class="editor-field">
+        <label for="edBorrower">Cliente</label>
+        <input class="editor-input" id="edBorrower" value="${escapeHtml(x.borrower||'')}" maxlength="80">
+      </div>
+
+      <div class="slider-card">
+        <div class="slider-top"><span class="slider-label">Valor do empréstimo</span><strong class="slider-value" id="edAmountOut">${money(currentAmount)}</strong></div>
+        <input class="loan-slider" id="edAmountSlider" type="range" min="100" max="100000" step="50" value="${Math.min(100000,Math.max(100,currentAmount))}">
+        <div class="slider-range"><span>R$ 100</span><span>R$ 100.000</span></div>
+        <div style="margin-top:9px"><input class="editor-input" id="edAmount" type="number" min="1" step="1" value="${currentAmount}"></div>
+      </div>
+
+      <div class="slider-card">
+        <div class="slider-top"><span class="slider-label">Valor da parcela</span><strong class="slider-value" id="edParcelOut">${money(currentParcel)}</strong></div>
+        <input class="loan-slider" id="edParcelSlider" type="range" min="1" max="${Math.max(1,Math.floor(currentAmount))}" step="1" value="${Math.min(currentParcel,Math.floor(currentAmount))}">
+        <div class="slider-range"><span>R$ 1</span><span id="edParcelMax">${money(currentAmount)}</span></div>
+        <div style="margin-top:9px"><input class="editor-input" id="edParcel" type="number" min="1" max="${Math.max(1,Math.floor(currentAmount))}" step="1" value="${Math.min(currentParcel,Math.floor(currentAmount))}"></div>
+      </div>
+
+      <div class="calc-box">
+        <div><span>Quantidade de parcelas</span><strong id="edCount">—</strong></div>
+        <div><span>Prazo</span><strong id="edMonths">—</strong></div>
+        <div><span>Parcelas padrão</span><strong id="edRegular">—</strong></div>
+        <div><span>Última parcela</span><strong id="edLast">—</strong></div>
+      </div>
+
+      <div class="editor-field">
+        <label for="edFirst">Primeiro vencimento</label>
+        <input class="editor-input" id="edFirst" type="date" value="${x.schedule?.[0]?.due||x.firstDue||todayISO()}">
+      </div>
+
+      <div class="editor-note">
+        A quantidade de meses é calculada automaticamente a partir do valor escolhido.
+        Exemplo: R$ 1.500 ÷ R$ 100 = <b>15 parcelas</b>. R$ 1.500 ÷ R$ 150 = <b>10 parcelas</b>.
+        Quando não houver divisão exata, a última parcela recebe somente o valor restante.
+      </div>
+
+      <div class="editor-actions">
+        <button type="button" class="editor-secondary" id="editorSchedule">EDITAR PARCELAS INDIVIDUALMENTE</button>
+        <button type="button" class="primary" id="editorSave">SALVAR CONTRATO</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+
+  const amountSlider=modal.querySelector('#edAmountSlider');
+  const amountInput=modal.querySelector('#edAmount');
+  const parcelSlider=modal.querySelector('#edParcelSlider');
+  const parcelInput=modal.querySelector('#edParcel');
+  const amountOut=modal.querySelector('#edAmountOut');
+  const parcelOut=modal.querySelector('#edParcelOut');
+  const countOut=modal.querySelector('#edCount');
+  const monthsOut=modal.querySelector('#edMonths');
+  const regularOut=modal.querySelector('#edRegular');
+  const lastOut=modal.querySelector('#edLast');
+  const parcelMax=modal.querySelector('#edParcelMax');
+
+  const num=(v,f=1)=>{const n=Number(String(v).replace(',','.'));return Number.isFinite(n)&&n>0?n:f};
+
+  function recalc(){
+    let amount=Math.max(1,num(amountInput.value,currentAmount));
+    amountInput.value=amount;
+    amountOut.textContent=money(amount);
+
+    let sliderAmount=Math.min(100000,Math.max(100,Math.round(amount/50)*50));
+    amountSlider.value=sliderAmount;
+
+    const maxParcel=Math.max(1,Math.floor(amount));
+    parcelSlider.max=String(maxParcel);
+    parcelInput.max=String(maxParcel);
+    parcelMax.textContent=money(maxParcel);
+
+    let parcel=Math.min(maxParcel,Math.max(1,num(parcelInput.value,currentParcel)));
+    parcelInput.value=parcel;
+    parcelSlider.value=parcel;
+    parcelOut.textContent=money(parcel);
+
+    const count=Math.max(1,Math.ceil(amount/parcel));
+    const last=Number((amount-parcel*(count-1)).toFixed(2));
+    countOut.textContent=count;
+    monthsOut.textContent=count===1?'1 mês':`${count} meses`;
+    regularOut.textContent=money(parcel);
+    lastOut.textContent=money(last);
+  }
+
+  amountSlider.addEventListener('input',()=>{amountInput.value=amountSlider.value;recalc()});
+  amountInput.addEventListener('input',()=>recalc());
+  parcelSlider.addEventListener('input',()=>{parcelInput.value=parcelSlider.value;recalc()});
+  parcelInput.addEventListener('input',()=>recalc());
+
+  modal.querySelector('#editorClose').onclick=()=>modal.remove();
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove()});
+
+  function buildSchedule(){
+    const amount=Math.max(1,num(amountInput.value,currentAmount));
+    const parcel=Math.min(amount,Math.max(1,num(parcelInput.value,currentParcel)));
+    const count=Math.max(1,Math.ceil(amount/parcel));
+    const first=modal.querySelector('#edFirst').value||todayISO();
+    return {
+      amount,parcel,count,first,
+      schedule:Array.from({length:count},(_,i)=>({
+        number:i+1,
+        amount:Number((i===count-1?(amount-parcel*(count-1)):parcel).toFixed(2)),
+        due:addMonths(first,i),
+        paid:(l&&l.schedule?.[i])?!!l.schedule[i].paid:false
+      }))
+    };
+  }
+
+  modal.querySelector('#editorSave').onclick=()=>{
+    const title=modal.querySelector('#edTitle').value.trim();
+    const borrower=modal.querySelector('#edBorrower').value.trim();
+    if(!title)return toast('Informe o nome do empréstimo.');
+    if(!borrower)return toast('Informe o cliente.');
+    const b=buildSchedule();
+    x.title=title;x.borrower=borrower;x.amount=b.amount;x.installmentValue=b.parcel;
+    x.firstDue=b.first;x.schedule=b.schedule;x.installments=b.count;
+    x.paid=x.schedule.filter(p=>p.paid).length;
+    if(isNew)state.loans.push(x);
+    save();modal.remove();
+    notify(isNew?'Novo empréstimo criado':'Empréstimo atualizado',`${x.title} — ${b.count} parcelas`);
+    render();toast(isNew?'Empréstimo criado.':'Empréstimo atualizado.');
+  };
+
+  modal.querySelector('#editorSchedule').onclick=()=>{
+    const b=buildSchedule();
+    x.amount=b.amount;x.installmentValue=b.parcel;x.firstDue=b.first;x.schedule=b.schedule;x.installments=b.count;
+    x.paid=x.schedule.filter(p=>p.paid).length;
+    if(isNew&&!state.loans.some(z=>z.id===x.id))state.loans.push(x);
+    save();modal.remove();openSchedule(x.id);
+  };
+
+  recalc();
+}
+
+function openSchedule(id){const l=state.loans.find(x=>x.id===id);if(!l)return;let action=prompt(`GERENCIAR PARCELAS\n\n${l.schedule.map(p=>`${p.number}. ${money(p.amount)} — ${p.due} — ${p.paid?'PAGA':'PENDENTE'}`).join('\n')}\n\nDigite o número da parcela para editar (ou 0 para sair):`,'0');if(action===null||action==='0')return;const i=parseInt(action)-1;if(i<0||i>=l.schedule.length)return toast('Parcela inválida.');const p=l.schedule[i];const amt=prompt(`Valor da ${p.number}ª parcela:`,String(p.amount));if(amt===null)return;const due=prompt(`Vencimento da ${p.number}ª parcela (AAAA-MM-DD):`,p.due);if(due===null)return;const paid=confirm(`A ${p.number}ª parcela está paga?\nOK = paga / Cancelar = pendente`);p.amount=Number(amt.replace(',','.'));p.due=due;p.paid=paid;l.amount=l.schedule.reduce((s,z)=>s+z.amount,0);l.installments=l.schedule.length;l.firstDue=l.schedule[0].due;save();notify('Parcela atualizada',`${l.title} — parcela ${p.number}`);render()}
+function notify(title,text,loanId=null){state.notifications.unshift({id:uid(),title,text,loanId,time:new Date().toLocaleString('pt-BR')});state.notifications=state.notifications.slice(0,100);save();if(title==='Pagamento registrado'&&state.settings.notificationsEnabled&&state.settings.notifyPayment!==false)systemNotify(title,text)}
+function renderNotifications(){const box=document.getElementById('notificationList');if(!box)return;box.innerHTML=state.notifications.length?state.notifications.map(n=>`<div class="notif"><strong>${escapeHtml(n.title)}</strong><div>${escapeHtml(n.text)}</div><span>${escapeHtml(n.time)}</span></div>`).join(''):`<div class="empty">Nenhuma notificação.</div>`}
+function toggleNotifications(){const panel=document.getElementById('notificationPanel');const admin=document.getElementById('adminOpen');const opening=!panel.classList.contains('open');panel.classList.toggle('open',opening);document.body.classList.toggle('notification-open',opening);if(admin)admin.style.display=opening?'none':(current==='admin'?'none':'block')}
+function clearNotifications(){state.notifications=[];save();renderNotifications()}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function resetProfile(){if(confirm('Redefinir dados locais? Isso apaga empréstimos, perfil e notificações.')){localStorage.removeItem(KEY);state=migrate();render();toast('Dados redefinidos')}}
+function saveBillingSettings(){const days=(document.getElementById('notifyDays')?.value||'').split(',').map(x=>parseInt(x.trim())).filter(x=>x>=1&&x<=365);state.settings.notifyDays=[...new Set(days.length?days:[7,3,1])].sort((a,b)=>b-a);state.settings.overdueLimit=Math.min(30,Math.max(1,parseInt(document.getElementById('overdueLimit')?.value||1)));state.settings.notifyToday=!!document.getElementById('notifyToday')?.checked;state.settings.notifyOverdue=!!document.getElementById('notifyOverdue')?.checked;state.settings.notifyPayment=!!document.getElementById('notifyPayment')?.checked;const tv=document.getElementById('notifyTime')?.value||'';state.settings.notifyTime=/^\d{2}:\d{2}$/.test(tv)?tv:'09:00';state.settings.notificationsEnabled=true;save();scheduleBillingNative().then(st=>{if(st==='denied')toast('Permissão negada. Ative as notificações do iCrédito nas configurações do Android.')});runNotifications(true);toast('Configurações de cobrança salvas.')}
+function saveNotifySettings(){saveBillingSettings()}
+function resetBillingSettings(){state.settings.notifyDays=[7,3,1];state.settings.overdueLimit=1;state.settings.notifyTime='09:00';state.settings.notifyToday=true;state.settings.notifyOverdue=true;state.settings.notifyPayment=true;save();render();toast('Configuração padrão restaurada.')}
+async function testBillingNotification(){
+  const perm=await ensureNativePermission();
+  if(perm==='denied')return toast('Permissão negada. Ative as notificações do iCrédito nas configurações do Android.');
+  const ok=systemNotify('Teste de cobrança','Esta é uma notificação de teste do iCrédito.');
+  try{if(navigator.vibrate)navigator.vibrate([120,80,120])}catch(e){}
+  toast(ok?'Notificação de teste enviada.':'Não foi possível enviar a notificação.');
+}
+function systemNotify(title,text){
+  try{const LN=nativeLN();if(LN){LN.schedule({notifications:[{id:Math.floor(Math.random()*1e6)+1000,title:String(title),body:String(text)}]});return true}}catch(e){}
+  try{
+    if(window.Android&&typeof window.Android.notify==='function'){window.Android.notify(String(title),String(text));return true}
+  }catch(e){}
+  try{
+    if('Notification' in window && Notification.permission==='granted'){new Notification(title,{body:text,tag:'icredito'});return true}
+  }catch(e){}
+  return false;
+}
+async function enableNotifications(){
+ state.settings.notificationsEnabled=true;save();
+ try{if(!nativeLN()&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission()}catch(e){}
+ const st=await scheduleBillingNative();
+ if(st==='denied'){state.settings.notificationsEnabled=false;save();render();return toast('Permissão negada. Ative as notificações do iCrédito nas configurações do Android.')}
+ const ok=systemNotify('iCrédito','Notificações ativadas. Os avisos de cobrança chegam às '+(state.settings.notifyTime||'09:00')+'.');
+ toast(ok?'Notificações ativadas.':'Seu aparelho não permitiu criar notificações.');
+ runNotifications(true);render();
+}
+function runNotifications(force=false,toBar=false){const days=state.settings.notifyDays||[7,3,1];let sent=false;state.loans.forEach(l=>l.schedule.forEach(p=>{if(p.paid)return;const d=daysUntil(p.due);let kind=null;if(d<0&&state.settings.notifyOverdue!==false)kind='ATRASO';else if(d===0&&state.settings.notifyToday!==false)kind='VENCE HOJE';else if(d>0&&days.includes(d))kind='LEMBRETE';if(!kind)return;const key=`${kind}|${l.id}|${p.number}|${p.due}`;const exists=state.notifications.some(n=>n.key===key);if(exists&&!force)return;const text=d<0?`${l.borrower}: parcela ${p.number} atrasada há ${Math.abs(d)} dia(s). Valor ${money(p.amount)}.`:d===0?`${l.borrower}: parcela ${p.number} vence hoje. Valor ${money(p.amount)}.`:`${l.borrower}: faltam ${d} dia(s) para a parcela ${p.number}. Valor ${money(p.amount)}.`;state.notifications.unshift({id:uid(),key,title:`${kind} — ${l.title}`,text,time:new Date().toLocaleString('pt-BR'),loanId:l.id});if(!nativeLN()||toBar)systemNotify(`${kind} — ${l.title}`,text);sent=true}));state.notifications=state.notifications.slice(0,100);save();renderNotifications();if(force&&!sent)toast('Nenhuma cobrança nova encontrada.')}
+function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='icredito-backup-v1.11.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function importData(file){const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.loans))throw Error();state=x;state.loans=state.loans.map(normalizeLoan);state.settings=state.settings||{notifyDays:[7,3,1]};save();render();toast('Backup importado.')}catch(e){toast('Backup inválido.')}};r.readAsText(file)}
+
+document.addEventListener('change',e=>{if(e.target.id==='importFile'&&e.target.files[0])importData(e.target.files[0])});
+document.addEventListener('touchstart',e=>{if(e.touches.length===1){touchX=e.touches[0].clientX;touchY=e.touches[0].clientY}},{passive:true});
+document.addEventListener('touchend',e=>{if(e.changedTouches.length!==1)return;const dx=e.changedTouches[0].clientX-touchX,dy=e.changedTouches[0].clientY-touchY;if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.3)return;const pages=['home','loans','parcels','profile'];if(current==='admin')return;let i=pages.indexOf(current);i+=dx<0?1:-1;if(i>=0&&i<pages.length)go(pages[i])});
+document.addEventListener('click',e=>{const panel=document.getElementById('notificationPanel');if(panel.classList.contains('open')&&!panel.contains(e.target)&&!e.target.closest('.bell')){panel.classList.remove('open');document.body.classList.remove('notification-open');const admin=document.getElementById('adminOpen');if(admin)admin.style.display=current==='admin'?'none':'block'}});
+/* V1.14 — agenda as cobranças no Android (avisa mesmo com o app fechado) */
+function nativeLN(){try{return (window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications)||null}catch(e){return null}}
+async function ensureNativePermission(){
+  const LN=nativeLN();if(!LN)return 'unavailable';
+  try{let p=await LN.checkPermissions();if(p.display!=='granted')p=await LN.requestPermissions();return p.display==='granted'?'granted':'denied'}catch(e){return 'unavailable'}
+}
+async function scheduleBillingNative(){
+  const LN=nativeLN();if(!LN)return 'unavailable';
+  if(!state.settings.notificationsEnabled)return 'off';
+  try{
+    if(await ensureNativePermission()!=='granted')return 'denied';
+    const pend=await LN.getPending();
+    const old=(pend.notifications||[]).filter(n=>Number(n.id)<=200);
+    if(old.length)await LN.cancel({notifications:old.map(n=>({id:n.id}))});
+    const days=state.settings.notifyDays||[7,3,1],limit=state.settings.overdueLimit||1,now=new Date(),list=[];
+    const t=String(state.settings.notifyTime||'09:00').split(':').map(Number),hh=t[0]||0,mm=t[1]||0;
+    const at=(iso,off)=>{const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d+off,hh,mm,0)};
+    state.loans.forEach(l=>l.schedule.forEach(p=>{
+      if(p.paid)return;
+      const add=(off,kind,text)=>{const w=at(p.due,off);if(w>now)list.push({w,title:`${kind} — ${l.title}`,body:text})};
+      days.forEach(n=>add(-n,'LEMBRETE',`${l.borrower}: faltam ${n} dia(s) para a parcela ${p.number}. Valor ${money(p.amount)}.`));
+      if(state.settings.notifyToday!==false)add(0,'VENCE HOJE',`${l.borrower}: parcela ${p.number} vence hoje. Valor ${money(p.amount)}.`);
+      if(state.settings.notifyOverdue!==false)for(let k=1;k<=limit;k++)add(k,'ATRASO',`${l.borrower}: parcela ${p.number} atrasada há ${k} dia(s). Valor ${money(p.amount)}.`);
+    }));
+    list.sort((a,b)=>a.w-b.w);
+    const notifications=list.slice(0,150).map((n,i)=>({id:i+1,title:n.title,body:n.body,schedule:{at:n.w,allowWhileIdle:true}}));
+    if(notifications.length)await LN.schedule({notifications});
+    return 'ok';
+  }catch(e){return 'error'}
+}
+setInterval(()=>runNotifications(false),60000);
+render();runNotifications(false);scheduleBillingNative();
+</script>
+
+<style>
+/* V9.9 — otimização específica para celulares (Redmi Note 12 / ~393px)
+/* Mantém o layout de tablets inalterado. */
+@media (max-width: 600px){
+  body{font-size:15px !important;}
+  .home-hero{
+    padding:30px 18px 32px !important;
+    border-radius:0 0 38px 38px !important;
+  }
+  /* Afasta os elementos do topo da barra de status do Android. */
+  .home-hero .hero-row{
+    padding-top:14px !important;
+    gap:12px !important;
+  }
+  .avatar{
+    width:64px !important;height:64px !important;font-size:26px !important;
+  }
+  .hero-name{font-size:24px !important;line-height:1.12 !important;}
+  .hero-sub{font-size:16px !important;}
+  .hero-total-label{margin-top:30px !important;font-size:16px !important;}
+  .hero-total{font-size:38px !important;letter-spacing:-.5px !important;}
+
+  .page{padding:0 16px 18px !important;}
+  .page h1{
+    font-size:32px !important;
+    line-height:1.12 !important;
+    margin:24px 0 22px !important;
+    letter-spacing:-1px !important;
+  }
+  .card{
+    padding:18px 16px !important;
+    border-radius:22px !important;
+    margin-bottom:17px !important;
+  }
+  .loan-head,.section-top{gap:11px !important;}
+  .loan-icon,.section-icon{
+    width:54px !important;height:54px !important;border-radius:17px !important;
+  }
+  .loan-icon svg,.section-icon svg{width:26px !important;height:26px !important;}
+  .loan-title{font-size:20px !important;line-height:1.15 !important;}
+  .muted{font-size:15px !important;line-height:1.25 !important;}
+  .section-top{margin-bottom:17px !important;}
+  .section-top h2{font-size:21px !important;line-height:1.15 !important;}
+  .stats{gap:18px 12px !important;}
+  .stat label{font-size:15px !important;line-height:1.2 !important;}
+  .stat strong{font-size:21px !important;}
+  .next-value{font-size:36px !important;margin-top:13px !important;}
+  .progress-row{margin-top:20px !important;font-size:15px !important;}
+  .primary{font-size:16px !important;padding:14px 14px !important;}
+  .small-btn{font-size:14px !important;padding:10px 12px !important;}
+  .empty{padding:38px 12px !important;font-size:15px !important;}
+  .parcel-title{font-size:16px !important;}
+  .parcel-date,.parcel-money{font-size:15px !important;}
+  .profile-grid{gap:18px !important;}
+  .profile-avatar{width:92px !important;height:92px !important;font-size:30px !important;}
+  .bell{width:50px !important;height:50px !important;}
+  .bell svg{width:25px !important;}
+
+  /* Evita que textos curtos importantes sejam quebrados artificialmente. */
+  .hero-name,.hero-sub,.loan-title,.section-top h2,.nav-btn span{white-space:nowrap !important;}
+  .notif strong{font-size:15px !important;line-height:1.2 !important;}
+  .notif div{font-size:14px !important;line-height:1.3 !important;}
+}
+
+@media (max-width: 380px){
+  .home-hero{padding-left:15px !important;padding-right:15px !important;}
+  .hero-name{font-size:22px !important;}
+  .hero-sub{font-size:15px !important;}
+  .hero-total{font-size:35px !important;}
+  .page{padding-left:13px !important;padding-right:13px !important;}
+  .page h1{font-size:30px !important;}
+  .section-top h2{font-size:19px !important;}
+  .loan-title{font-size:18px !important;}
+}
+</style>
+
+</body>
+</html>
+<style>
+/* V9.9 — correção definitiva da barra inferior para APK/WebView Android */
+.bottom-nav{
+  bottom:calc(45px + env(safe-area-inset-bottom,0px)) !important;
+  padding:5px 10px 5px !important;
+}
+.nav-btn{
+  padding:5px 3px 2px !important;
+  gap:2px !important;
+  line-height:1 !important;
+}
+.nav-btn svg{
+  width:23px !important;
+  height:23px !important;
+  flex:none !important;
+}
+.nav-btn span{
+  font-size:11.5px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+</style>
+<style>
+/* ===== V9.9.1 — RESPIRO SUPERIOR + DATAS EM UMA LINHA ===== */
+@media (max-width:600px){
+  /* Cria uma área de respiro consistente entre a barra de status do Android
+     e os títulos das páginas, sem alterar o layout de tablet. */
+  .page{
+    padding-top:14px !important;
+  }
+  .page h1{
+    margin-top:24px !important;
+  }
+
+  /* Também dá um pequeno respiro extra ao conteúdo inicial da Home. */
+  .home-hero .hero-row{
+    padding-top:20px !important;
+  }
+
+  /* A data de cada parcela permanece inteira em uma única linha. */
+  .parcel-row{min-width:0 !important;}
+  .parcel-info{min-width:0 !important;}
+  .parcel-date{
+    white-space:nowrap !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    font-size:14px !important;
+    letter-spacing:-.15px !important;
+  }
+}
+
+@media (max-width:380px){
+  .parcel-date{font-size:13px !important;letter-spacing:-.25px !important;}
+}
+/* ===== FIM V9.9.1 ===== */
+</style>
+<style>
+/* V9.9.3 — degradê refinado e engrenagem corrigida */
+@media (max-width:600px){
+  /* +2px de respiro no topo das páginas */
+  .page{padding-top:16px !important;}
+  .home-hero .hero-row{padding-top:22px !important;}
+
+  /* Admin ligeiramente menor, preservando a posição */
+  .admin-open{
+    min-width:80px !important;
+    height:50px !important;
+    padding:0 18px !important;
+  }
+}
+@media (max-width:380px){
+  .admin-open{min-width:74px !important;padding:0 15px !important;}
+}
+</style>
